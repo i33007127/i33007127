@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexPlay — Unblocked Games</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080810; --surface:#10101c; --card:#16162a; --border:#252540;
+  --accent:#6c3bff; --accent2:#00d4ff; --green:#00ff88; --text:#eeeeff; --muted:#7777aa;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 80% 50% at 20% -10%,rgba(108,59,255,.12) 0%,transparent 60%),
+             radial-gradient(ellipse 60% 40% at 80% 110%,rgba(0,212,255,.08) 0%,transparent 60%);}
+header{position:sticky;top:0;z-index:200;background:rgba(8,8,16,.9);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);display:flex;align-items:center;gap:1rem;padding:0 1.5rem;height:60px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;
+  background:linear-gradient(135deg,#6c3bff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap;}
+.search-wrap{flex:1;max-width:420px;display:flex;align-items:center;background:var(--surface);
+  border:1px solid var(--border);border-radius:999px;padding:0 1rem;gap:8px;transition:border-color .2s;}
+.search-wrap:focus-within{border-color:var(--accent);}
+.search-wrap input{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:'Outfit',sans-serif;font-size:.9rem;padding:8px 0;}
+.search-wrap input::placeholder{color:var(--muted);}
+.game-count-badge{margin-left:auto;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:4px 12px;font-size:.78rem;color:var(--muted);white-space:nowrap;}
+.game-count-badge span{color:var(--accent2);font-weight:600;}
+.tabs{position:sticky;top:60px;z-index:190;background:rgba(8,8,16,.95);border-bottom:1px solid var(--border);display:flex;padding:0 1.5rem;}
+.tab{padding:12px 24px;font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:500;cursor:pointer;color:var(--muted);
+  border-bottom:2px solid transparent;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--accent2);border-bottom-color:var(--accent2);}
+.cat-bar{position:sticky;top:105px;z-index:180;background:rgba(8,8,16,.9);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border);padding:10px 1.5rem;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;}
+.cat-bar::-webkit-scrollbar{display:none;}
+.pill{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:5px 14px;border-radius:999px;
+  font-size:.8rem;cursor:pointer;white-space:nowrap;transition:all .2s;font-family:'Outfit',sans-serif;}
+.pill:hover{border-color:var(--accent);color:var(--text);}
+.pill.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+#proxiesPanel{display:none;}
+.page{max-width:1400px;margin:0 auto;padding:1.5rem;position:relative;z-index:1;}
+.section-label{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--text);
+  margin-bottom:1rem;display:flex;align-items:center;gap:10px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:2rem;}
+.game-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;
+  transition:transform .18s,border-color .18s,box-shadow .18s;display:flex;flex-direction:column;}
+.game-card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 6px 24px rgba(108,59,255,.2);}
+.thumb{width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;}
+.game-info{padding:8px 10px;flex:1;display:flex;flex-direction:column;gap:3px;}
+.game-title{font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.game-tag{font-size:.68rem;color:var(--accent2);text-transform:uppercase;letter-spacing:.8px;}
+.pagination{display:flex;align-items:center;justify-content:center;gap:8px;padding:1rem 0 2rem;flex-wrap:wrap;}
+.page-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:6px;
+  cursor:pointer;font-family:'Outfit',sans-serif;font-size:.85rem;transition:all .2s;}
+.page-btn:hover{border-color:var(--accent);color:var(--text);}
+.page-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.page-info{color:var(--muted);font-size:.85rem;}
+.no-results{text-align:center;padding:4rem;color:var(--muted);display:none;}
+.no-results.show{display:block;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+.overlay.open{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:14px;width:min(960px,96vw);overflow:hidden;display:flex;flex-direction:column;}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--border);}
+.modal-head-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:1px;}
+.modal-btns{display:flex;gap:8px;align-items:center;}
+.mbtn{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:5px 14px;border-radius:6px;
+  cursor:pointer;font-size:.82rem;font-family:'Outfit',sans-serif;transition:all .2s;}
+.mbtn:hover{color:var(--text);border-color:var(--accent);}
+.mbtn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+iframe#gframe{width:100%;aspect-ratio:16/9;border:none;background:#000;display:block;}
+.proxy-intro{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.2rem 1.5rem;margin-bottom:1.5rem;}
+.proxy-intro p{color:var(--muted);font-size:.9rem;line-height:1.6;}
+.proxy-intro strong{color:var(--accent2);}
+.proxy-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:2rem;}
+.proxy-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.2rem;
+  display:flex;flex-direction:column;gap:10px;transition:border-color .2s;}
+.proxy-card:hover{border-color:var(--accent);}
+.proxy-header{display:flex;align-items:center;gap:10px;}
+.proxy-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.proxy-name{font-weight:600;font-size:.95rem;}
+.proxy-desc{font-size:.82rem;color:var(--muted);line-height:1.5;}
+.proxy-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.ptag{background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px;font-size:.72rem;color:var(--muted);}
+.proxy-links{display:flex;gap:8px;flex-wrap:wrap;}
+.plink{background:var(--accent);border:none;color:#fff;padding:7px 16px;border-radius:7px;font-size:.82rem;
+  font-family:'Outfit',sans-serif;cursor:pointer;text-decoration:none;transition:background .2s;}
+.plink:hover{background:#5530cc;}
+.plink.alt{background:var(--surface);border:1px solid var(--border);color:var(--muted);}
+.plink.alt:hover{border-color:var(--accent2);color:var(--text);}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);display:inline-block;margin-right:4px;}
+@media(max-width:600px){
+  header{padding:0 1rem;} .tabs{padding:0 1rem;} .cat-bar{padding:8px 1rem;top:96px;}
+  .page{padding:1rem;} .games-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">NexPlay</div>
+  <div class="search-wrap">
+    <span>🔍</span>
+    <input type="text" id="searchInput" placeholder="Search games..." oninput="onSearch()">
+  </div>
+  <div class="game-count-badge"><span id="totalCount">0</span> games</div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('games',this)">🎮 Games</button>
+  <button class="tab" onclick="showTab('proxies',this)">🔓 Proxies &amp; Unblockers</button>
+</div>
+
+<div id="gamesPanel">
+  <div class="cat-bar" id="catBar">
+    <div class="pill active" onclick="setCategory('all',this)">All</div>
+    <div class="pill" onclick="setCategory('action',this)">⚔️ Action</div>
+    <div class="pill" onclick="setCategory('adventure',this)">🗺️ Adventure</div>
+    <div class="pill" onclick="setCategory('arcade',this)">👾 Arcade</div>
+    <div class="pill" onclick="setCategory('fighting',this)">🥊 Fighting</div>
+    <div class="pill" onclick="setCategory('horror',this)">👻 Horror</div>
+    <div class="pill" onclick="setCategory('idle',this)">💤 Idle</div>
+    <div class="pill" onclick="setCategory('multiplayer',this)">🌐 Multiplayer</div>
+    <div class="pill" onclick="setCategory('physics',this)">🔧 Physics</div>
+    <div class="pill" onclick="setCategory('platformer',this)">🏃 Platformer</div>
+    <div class="pill" onclick="setCategory('puzzle',this)">🧩 Puzzle</div>
+    <div class="pill" onclick="setCategory('racing',this)">🏎️ Racing</div>
+    <div class="pill" onclick="setCategory('retro',this)">🕹️ Retro</div>
+    <div class="pill" onclick="setCategory('rpg',this)">⚔️ RPG</div>
+    <div class="pill" onclick="setCategory('sandbox',this)">🏗️ Sandbox</div>
+    <div class="pill" onclick="setCategory('shooter',this)">🔫 Shooter</div>
+    <div class="pill" onclick="setCategory('simulation',this)">🧠 Simulation</div>
+    <div class="pill" onclick="setCategory('sports',this)">⚽ Sports</div>
+    <div class="pill" onclick="setCategory('strategy',this)">♟️ Strategy</div>
+  </div>
+  <div class="page">
+    <div class="section-label" id="sectionLabel">🔥 All Games</div>
+    <div class="games-grid" id="gamesGrid"></div>
+    <div class="no-results" id="noResults">😔 No games found!</div>
+    <div class="pagination" id="pagination"></div>
+  </div>
+</div>
+
+<div id="proxiesPanel">
+  <div class="page">
+    <div class="section-label">🔓 Web Proxies</div>
+    <div class="proxy-intro"><p>These tools let you bypass school or network filters. <strong>Click Open or Visit</strong> to use them in a new tab.</p></div>
+    <div class="proxy-grid" id="proxyGrid"></div>
+    <div class="section-label">🎮 Game Sites with Built-in Bypass</div>
+    <div class="proxy-grid" id="gameProxyGrid"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-head-title" id="modalTitle">Game</div>
+      <div class="modal-btns">
+        <button class="mbtn primary" onclick="goFullscreen()">⛶ Fullscreen</button>
+        <button class="mbtn" onclick="openTab()">↗ New Tab</button>
+        <button class="mbtn" onclick="closeModal()">✕</button>
+      </div>
+    </div>
+    <iframe id="gframe" src="" allowfullscreen allow="fullscreen"></iframe>
+  </div>
+</div>
+
+<script>
+const BASE='https://ubghyper.github.io/games/';
+const games=[
+  {t:'2048',c:'puzzle',e:'🟨',bg:'#2a2a0a',u:'2048.html'},
+  {t:'3D Bowling',c:'sports',e:'🎳',bg:'#0a1a2a',u:'3D-Bowling.html'},
+  {t:'8 Ball Billiards',c:'sports',e:'🎱',bg:'#0a2a0a',u:'8-Ball-Billiards-Classic.html'},
+  {t:'Achievement Unlocked',c:'platformer',e:'🏆',bg:'#2a1a0a',u:'Achievement-Unlocked.html'},
+  {t:'Achievement Unlocked 2',c:'platformer',e:'🏆',bg:'#2a1a0a',u:'Achievement-Unlocked-2.html'},
+  {t:'Achievement Unlocked 3',c:'platformer',e:'🏆',bg:'#2a1a0a',u:'Achievement-Unlocked-3.html'},
+  {t:'Adventure',c:'adventure',e:'🗡️',bg:'#1a2a1a',u:'Adventure.html'},
+  {t:'Adventure Drivers',c:'racing',e:'🚗',bg:'#2a1a0a',u:'Adventure-Drivers.html'},
+  {t:'Age Of War',c:'strategy',e:'⚔️',bg:'#1a1a0a',u:'Age-Of-War.html'},
+  {t:'Age Of War 2',c:'strategy',e:'⚔️',bg:'#1a1a0a',u:'Age-Of-War-2.html'},
+  {t:'Among Us Online',c:'multiplayer',e:'👨‍🚀',bg:'#0a0a2a',u:'AmongUs-Online.html'},
+  {t:'Among Us Online 2',c:'multiplayer',e:'👨‍🚀',bg:'#0a0a2a',u:'AmongUs-Online-2.html'},
+  {t:"Andy's Apple Farm",c:'adventure',e:'🍎',bg:'#1a2a0a',u:'Andys-Apple-Farm.html'},
+  {t:'Anton Blast Demo',c:'platformer',e:'💥',bg:'#2a0a0a',u:'Anton-Blast-Demo-v12.html'},
+  {t:'Apes vs Helium',c:'arcade',e:'🦍',bg:'#1a2a0a',u:'Apes-vs-Helium.html'},
+  {t:'Archery World Tour',c:'sports',e:'🏹',bg:'#1a2a1a',u:'Archery-World-Tour.html'},
+  {t:'Attack Hole',c:'arcade',e:'🕳️',bg:'#0a0a2a',u:'AttackHole.html'},
+  {t:'Aviamasters',c:'action',e:'✈️',bg:'#0a1a2a',u:'Aviamasters.html'},
+  {t:'Awesome Cars',c:'racing',e:'🚘',bg:'#2a0a1a',u:'Awesome-Cars.html'},
+  {t:'Awesome Planes',c:'shooter',e:'🛩️',bg:'#0a1a2a',u:'Awesome-Planes.html'},
+  {t:'Awesome Tanks',c:'shooter',e:'🪖',bg:'#1a2a0a',u:'Awesome-Tanks.html'},
+  {t:'Awesome Tanks 2',c:'shooter',e:'🪖',bg:'#1a2a0a',u:'Awesome-Tanks-2.html'},
+  {t:'Bad Ice Cream 2',c:'arcade',e:'🍦',bg:'#0a1a2a',u:'Bad-Ice-Cream-2.html'},
+  {t:'Bad Ice Cream 3',c:'arcade',e:'🍦',bg:'#0a1a2a',u:'Bad-Ice-Cream-3.html'},
+  {t:"Baldi's Basics",c:'horror',e:'📏',bg:'#2a2a0a',u:'BALDI.html'},
+  {t:'Ball Blast',c:'arcade',e:'💣',bg:'#2a0a0a',u:'Ball-Blast-HTML5.html'},
+  {t:'Bartender The Right Mix',c:'simulation',e:'🍸',bg:'#1a0a2a',u:'Bartender-The-Right-Mix.html'},
+  {t:'Basket Champs',c:'sports',e:'🏀',bg:'#2a0a0a',u:'Basket-Champs.html'},
+  {t:'Basket Random',c:'sports',e:'🏀',bg:'#2a0a0a',u:'Basket-Random.html'},
+  {t:'Basketball FRVR',c:'sports',e:'🏀',bg:'#2a0a0a',u:'Basketball-FRVR.html'},
+  {t:'Basketball Legends 2020',c:'sports',e:'🏀',bg:'#2a0a0a',u:'Basketball-Legends-2020.html'},
+  {t:'Basketball Stars',c:'sports',e:'🏀',bg:'#2a0a0a',u:'Basketball-Stars.html'},
+  {t:'Bejeweled',c:'puzzle',e:'💎',bg:'#1a0a2a',u:'Bejeweled.html'},
+  {t:'Big Tower Tiny Square 2',c:'platformer',e:'🏗️',bg:'#0a1a1a',u:'Big-Tower-Tiny-Square-2.html'},
+  {t:'Billiards',c:'sports',e:'🎱',bg:'#0a2a0a',u:'Billards.html'},
+  {t:'Bitlife',c:'simulation',e:'👶',bg:'#0a1a2a',u:'Bitlife.html'},
+  {t:'Blackjack',c:'arcade',e:'🃏',bg:'#0a2a0a',u:'Blackjack.html'},
+  {t:'Blade Ball',c:'action',e:'⚡',bg:'#0a0a2a',u:'Blade-Ball.html'},
+  {t:'Block Blast',c:'puzzle',e:'🟦',bg:'#0a1a2a',u:'Block-Blast.html'},
+  {t:'Blockpost',c:'shooter',e:'🔫',bg:'#1a1a0a',u:'Blockpost.html'},
+  {t:'Bloons TD 4',c:'strategy',e:'🎈',bg:'#2a0a1a',u:'BTD-4.html'},
+  {t:'Bloons TD 5',c:'strategy',e:'🎈',bg:'#2a0a1a',u:'Bloons-TD-5.html'},
+  {t:'Bloons Tower Defence',c:'strategy',e:'🎈',bg:'#2a0a1a',u:'Bloons-Tower-Defence.html'},
+  {t:'Bloons Tower Defence 2',c:'strategy',e:'🎈',bg:'#2a0a1a',u:'Bloons-Tower-Defence-2.html'},
+  {t:'Bloons Tower Defence 3',c:'strategy',e:'🎈',bg:'#2a0a1a',u:'Bloons-Tower-Defence-3.html'},
+  {t:'Bloxorz',c:'puzzle',e:'📦',bg:'#0a1a2a',u:'Bloxorz.html'},
+  {t:'Bob The Robber',c:'adventure',e:'🕵️',bg:'#1a1a0a',u:'Bob-The-Robber.html'},
+  {t:'Bob The Robber 2',c:'adventure',e:'🕵️',bg:'#1a1a0a',u:'bob-the-robber-2.html'},
+  {t:'Bob The Robber 4',c:'adventure',e:'🕵️',bg:'#1a1a0a',u:'bob-the-robber-4.html'},
+  {t:"Bob's Onslaught",c:'shooter',e:'💥',bg:'#2a0a0a',u:'Bobs-Onslaught.html'},
+  {t:'Bottle Jump 3D',c:'arcade',e:'🍾',bg:'#0a2a2a',u:'Bottle-Jump-3D.html'},
+  {t:'Bouncemasters',c:'arcade',e:'🏐',bg:'#2a1a0a',u:'Bouncemasters.html'},
+  {t:'Boxhead',c:'shooter',e:'🧟',bg:'#1a0a0a',u:'Boxhead.html'},
+  {t:'Boxing Random',c:'fighting',e:'🥊',bg:'#2a0a0a',u:'Boxing-Random.html'},
+  {t:'Breaking The Bank',c:'action',e:'🏦',bg:'#1a1a0a',u:'Breaking-The-Bank.html'},
+  {t:'Bubble Tanks TD 1',c:'strategy',e:'🫧',bg:'#0a1a2a',u:'Bubble-Tanks-TD-1.html'},
+  {t:'Bubble Tanks TD 2',c:'strategy',e:'🫧',bg:'#0a1a2a',u:'Bubble-Tanks-TD-2.html'},
+  {t:'Bubble Tanks Arena',c:'action',e:'🫧',bg:'#0a1a2a',u:'Bubble-Tanks-Arena.html'},
+  {t:'Celeste Classic',c:'platformer',e:'🏔️',bg:'#0a0a2a',u:'Celeste-Classic.html'},
+  {t:'Chrome Dino',c:'arcade',e:'🦕',bg:'#1a1a1a',u:'Chrome-Dino.html'},
+  {t:'Click The Wawas',c:'arcade',e:'🐾',bg:'#2a0a2a',u:'Click-The-Wawas.html'},
+  {t:'Clicker Heroes',c:'idle',e:'⚔️',bg:'#1a1a0a',u:'Clicker-Heroes.html'},
+  {t:'Cookie Clicker',c:'idle',e:'🍪',bg:'#2a1a0a',u:'Cookie-Clicker.html'},
+  {t:'Crossing the Pit',c:'platformer',e:'🕳️',bg:'#1a0a1a',u:'Crossing-The-Pit.html'},
+  {t:'Cuphead',c:'action',e:'☕',bg:'#2a0a0a',u:'Cuphead.html'},
+  {t:'Cursed Treasure',c:'strategy',e:'💎',bg:'#1a0a2a',u:'Cursed-Treasure.html'},
+  {t:'Cursed Treasure 2',c:'strategy',e:'💎',bg:'#1a0a2a',u:'Cursed-Treasure-2.html'},
+  {t:'Cut The Rope',c:'puzzle',e:'🪢',bg:'#0a2a1a',u:'Cut-The-Rope.html'},
+  {t:'Dead Zed',c:'shooter',e:'🧟',bg:'#1a0a0a',u:'Dead-Zed.html'},
+  {t:'Death Run 3D',c:'racing',e:'💀',bg:'#0a0a1a',u:'Death-Run-3D.html'},
+  {t:'Dinosaur Game',c:'arcade',e:'🦕',bg:'#1a1a1a',u:'Dinosaur-Game.html'},
+  {t:'Doom',c:'shooter',e:'👹',bg:'#2a0a0a',u:'Doom.html'},
+  {t:'Doodle Jump',c:'arcade',e:'🎮',bg:'#0a2a1a',u:'Doodle-Jump.html'},
+  {t:'Drive Mad',c:'physics',e:'🚗',bg:'#2a1a0a',u:'Drive-Mad.html'},
+  {t:'Duck Life 4',c:'adventure',e:'🦆',bg:'#2a2a0a',u:'Duck-Life-4.html'},
+  {t:'Duck Life 5',c:'adventure',e:'🦆',bg:'#2a2a0a',u:'Duck-Life-5.html'},
+  {t:'Eggy Car',c:'physics',e:'🥚',bg:'#2a2a0a',u:'Eggy-Car.html'},
+  {t:'Elastic Man',c:'simulation',e:'👨',bg:'#0a2a2a',u:'Elastic-Man.html'},
+  {t:'Fall Guys',c:'multiplayer',e:'🫘',bg:'#2a0a2a',u:'Fall-Guys.html'},
+  {t:'Fancy Pants 2',c:'platformer',e:'👖',bg:'#1a2a0a',u:'Fancy-Pants-2.html'},
+  {t:'Fancy Pants 3',c:'platformer',e:'👖',bg:'#1a2a0a',u:'Fancy-Pants-3.html'},
+  {t:'Fireboy And Watergirl',c:'puzzle',e:'🔥',bg:'#2a0a0a',u:'Fireboy-And-Watergirl.html'},
+  {t:'Five Nights at Freddys',c:'horror',e:'🐻',bg:'#1a0a0a',u:'FNAF.html'},
+  {t:'Five Nights at Freddys 2',c:'horror',e:'🐻',bg:'#1a0a0a',u:'FNAF-2.html'},
+  {t:'Five Nights at Freddys 3',c:'horror',e:'🐻',bg:'#1a0a0a',u:'FNAF-3.html'},
+  {t:'Five Nights at Freddys 4',c:'horror',e:'🐻',bg:'#1a0a0a',u:'FNAF-4.html'},
+  {t:'Flappy Bird',c:'arcade',e:'🐦',bg:'#0a1a2a',u:'Flappy-Bird.html'},
+  {t:'Flappy Dunk',c:'sports',e:'🏀',bg:'#0a1a2a',u:'Flappy-Dunk.html'},
+  {t:'Fleeing the Complex',c:'adventure',e:'🏃',bg:'#0a1a2a',u:'Fleeing-The-Complex.html'},
+  {t:'Football Legends',c:'sports',e:'⚽',bg:'#0a2a0a',u:'Football-Legends.html'},
+  {t:'Fruit Ninja',c:'arcade',e:'🍉',bg:'#2a0a1a',u:'Fruit-Ninja.html'},
+  {t:'Galaxy Attack',c:'shooter',e:'👾',bg:'#0a0a2a',u:'Galaxy-Attack.html'},
+  {t:'Geometry Dash',c:'platformer',e:'🔷',bg:'#0a0a2a',u:'Geometry-Dash.html'},
+  {t:'Geometry Dash Subzero',c:'platformer',e:'🔷',bg:'#0a0a2a',u:'Geometry-Dash-Subzero.html'},
+  {t:'Getting Over It',c:'physics',e:'⛏️',bg:'#1a1a2a',u:'Getting-Over-It.html'},
+  {t:'Granny',c:'horror',e:'👵',bg:'#1a0a0a',u:'Granny.html'},
+  {t:'Gravity Guy',c:'platformer',e:'🌀',bg:'#0a0a2a',u:'Gravity-Guy.html'},
+  {t:'Gun Mayham 2',c:'shooter',e:'🔫',bg:'#2a0a0a',u:'Gun-Mayham-2.html'},
+  {t:'Gun Mayham Redux',c:'shooter',e:'🔫',bg:'#2a0a0a',u:'Gun-Mayham-Redux.html'},
+  {t:'Happy Wheels',c:'physics',e:'☠️',bg:'#2a0a0a',u:'Happy-Wheels.html'},
+  {t:'Helix Jump',c:'arcade',e:'🌀',bg:'#0a1a2a',u:'Helix-Jump.html'},
+  {t:'Hill Climb Racing',c:'physics',e:'🏔️',bg:'#1a2a0a',u:'Hill-Climb-Racing.html'},
+  {t:'Hole.io',c:'multiplayer',e:'🕳️',bg:'#0a0a1a',u:'Hole-io.html'},
+  {t:'Hungry Shark Arena',c:'multiplayer',e:'🦈',bg:'#0a1a2a',u:'Hungry-Shark-Arena.html'},
+  {t:'Idle Mining Empire',c:'idle',e:'⛏️',bg:'#1a1a0a',u:'Idle-Mining-Empire.html'},
+  {t:'Iron Snout',c:'fighting',e:'🐷',bg:'#2a0a0a',u:'Iron-Snout.html'},
+  {t:'Jelly Truck',c:'physics',e:'🚛',bg:'#0a2a1a',u:'Jelly-Truck.html'},
+  {t:'Jetpack Joyride',c:'arcade',e:'🚀',bg:'#0a0a2a',u:'Jetpack-Joyride.html'},
+  {t:'Johnny Trigger',c:'action',e:'🔫',bg:'#1a0a0a',u:'Johnny-Trigger.html'},
+  {t:'Jump',c:'platformer',e:'⬆️',bg:'#0a0a2a',u:'Jump.html'},
+  {t:'Kingdom Rush',c:'strategy',e:'🏰',bg:'#1a1a0a',u:'Kingdom-Rush.html'},
+  {t:'Knife Hit',c:'arcade',e:'🔪',bg:'#1a0a0a',u:'Knife-Hit.html'},
+  {t:'Krunker.io',c:'shooter',e:'🔫',bg:'#2a1a0a',u:'Krunker.html'},
+  {t:'Learn to Fly 2',c:'physics',e:'🐧',bg:'#0a1a2a',u:'Learn-To-Fly-2.html'},
+  {t:'Learn to Fly 3',c:'physics',e:'🐧',bg:'#0a1a2a',u:'Learn-To-Fly-3.html'},
+  {t:'Line Rider 2',c:'physics',e:'🎿',bg:'#1a1a1a',u:'Line-Rider-2.html'},
+  {t:'Ludo',c:'multiplayer',e:'🎲',bg:'#1a2a1a',u:'Ludo.html'},
+  {t:'Mad GunZ',c:'shooter',e:'💥',bg:'#2a0a0a',u:'Mad-GunZ.html'},
+  {t:'Madalin Stunt Cars 2',c:'racing',e:'🏎️',bg:'#0a0a2a',u:'Madalin-Stunt-Cars-2.html'},
+  {t:'Madalin Stunt Cars 3',c:'racing',e:'🏎️',bg:'#0a0a2a',u:'Madalin-Stunt-Cars-3.html'},
+  {t:'Minecraft Classic',c:'sandbox',e:'⛏️',bg:'#1a2a0a',u:'Minecraft-Classic.html'},
+  {t:'Minesweeper',c:'puzzle',e:'💣',bg:'#1a1a1a',u:'Minesweeper.html'},
+  {t:'Money Movers',c:'puzzle',e:'💰',bg:'#2a2a0a',u:'Money-Movers.html'},
+  {t:'Money Movers 2',c:'puzzle',e:'💰',bg:'#2a2a0a',u:'Money-Movers-2.html'},
+  {t:'Monkey Mart',c:'simulation',e:'🐒',bg:'#2a1a0a',u:'Monkey-Mart.html'},
+  {t:'Moto X3M',c:'racing',e:'🏍️',bg:'#2a0a0a',u:'Moto-X3M.html'},
+  {t:'Moto X3M 2',c:'racing',e:'🏍️',bg:'#2a0a0a',u:'Moto-X3M-2.html'},
+  {t:'Moto X3M 3',c:'racing',e:'🏍️',bg:'#2a0a0a',u:'Moto-X3M-3.html'},
+  {t:'Moto X3M 4',c:'racing',e:'🏍️',bg:'#2a0a0a',u:'Moto-X3M-4.html'},
+  {t:'Moto X3M Pool Party',c:'racing',e:'🏊',bg:'#0a1a2a',u:'Moto-X3M-Pool-Party.html'},
+  {t:'Moto X3M Spooky Land',c:'racing',e:'🎃',bg:'#1a0a0a',u:'Moto-X3M-Spooky-Land.html'},
+  {t:'Moto X3M Winter',c:'racing',e:'❄️',bg:'#0a1a2a',u:'Moto-X3M-Winter.html'},
+  {t:'Mr. Mine',c:'idle',e:'⛏️',bg:'#1a1a0a',u:'Mr-Mine.html'},
+  {t:'Murder',c:'puzzle',e:'🔪',bg:'#1a0a0a',u:'Murder.html'},
+  {t:'Ninja Vs Evilcorp',c:'action',e:'🥷',bg:'#0a0a1a',u:'Ninja-Vs-Evilcorp.html'},
+  {t:'OvO',c:'platformer',e:'🏃',bg:'#0a0a1a',u:'OvO.html'},
+  {t:'OvO 2',c:'platformer',e:'🏃',bg:'#0a0a1a',u:'OvO-2.html'},
+  {t:'Pac-Man',c:'arcade',e:'🟡',bg:'#0a0a1a',u:'Pac-Man.html'},
+  {t:'Paper Minecraft',c:'sandbox',e:'📄',bg:'#1a2a0a',u:'Paper-Minecraft.html'},
+  {t:'Parking Fury 3D',c:'simulation',e:'🅿️',bg:'#0a1a1a',u:'Parking-Fury-3D.html'},
+  {t:'Penguin Diner',c:'simulation',e:'🐧',bg:'#0a1a2a',u:'Penguin-Diner.html'},
+  {t:'Plants vs Zombies',c:'strategy',e:'🌻',bg:'#1a2a0a',u:'Plants-vs-Zombies.html'},
+  {t:'Pong',c:'arcade',e:'🏓',bg:'#0a0a0a',u:'Pong.html'},
+  {t:'Portal',c:'puzzle',e:'🌀',bg:'#0a1a1a',u:'Portal.html'},
+  {t:'Punch Kick Duck',c:'fighting',e:'🥊',bg:'#2a0a0a',u:'Punch-Kick-Duck.html'},
+  {t:'Ragdoll Archers',c:'physics',e:'🏹',bg:'#1a1a2a',u:'Ragdoll-Archers.html'},
+  {t:'Retro Bowl',c:'sports',e:'🏈',bg:'#2a0a1a',u:'Retro-Bowl.html'},
+  {t:'Riddle School',c:'adventure',e:'🏫',bg:'#1a1a0a',u:'Riddle-School.html'},
+  {t:'Riddle School 2',c:'adventure',e:'🏫',bg:'#1a1a0a',u:'Riddle-School-2.html'},
+  {t:'Road Fury',c:'action',e:'🚗',bg:'#2a0a0a',u:'Road-Fury.html'},
+  {t:'Rocket Soccer Derby',c:'sports',e:'🚀',bg:'#0a0a2a',u:'Rocket-Soccer-Derby.html'},
+  {t:'Run 3',c:'platformer',e:'🏃',bg:'#0a0a2a',u:'Run-3.html'},
+  {t:'Run 4',c:'platformer',e:'🏃',bg:'#0a0a2a',u:'Run-4.html'},
+  {t:'Sandboxels',c:'sandbox',e:'🏗️',bg:'#1a1a2a',u:'Sandboxels.html'},
+  {t:'Shell Shockers',c:'shooter',e:'🥚',bg:'#2a1a0a',u:'Shell-Shockers.html'},
+  {t:'Slenderman',c:'horror',e:'🌲',bg:'#0a1a0a',u:'Slenderman.html'},
+  {t:'Slope',c:'arcade',e:'🟢',bg:'#1a2a1a',u:'Slope.html'},
+  {t:'Slope 2',c:'arcade',e:'🟢',bg:'#1a2a1a',u:'Slope-2.html'},
+  {t:'Smash Karts',c:'racing',e:'💣',bg:'#2a0a2a',u:'Smash-Karts.html'},
+  {t:'Snake',c:'arcade',e:'🐍',bg:'#1a2a1a',u:'Snake.html'},
+  {t:'Snow Rider 3D',c:'racing',e:'🏔️',bg:'#0a1a2a',u:'Snow-Rider-3D.html'},
+  {t:'Soccer Random',c:'sports',e:'⚽',bg:'#0a2a0a',u:'Soccer-Random.html'},
+  {t:'Sonic',c:'platformer',e:'💨',bg:'#0a0a2a',u:'Sonic.html'},
+  {t:'Stack Ball',c:'arcade',e:'🎯',bg:'#1a0a2a',u:'Stack-Ball.html'},
+  {t:'Stickman Hook',c:'arcade',e:'🦸',bg:'#0a0a2a',u:'Stickman-Hook.html'},
+  {t:'Stickman Ragdoll',c:'physics',e:'🕺',bg:'#1a0a1a',u:'Stickman-Ragdoll.html'},
+  {t:'Stick War Legacy',c:'strategy',e:'⚔️',bg:'#1a1a0a',u:'Stick-War-Legacy.html'},
+  {t:'Subway Surfers',c:'arcade',e:'🛹',bg:'#1a0a2a',u:'Subway-Surfers.html'},
+  {t:'Super Mario Bros',c:'platformer',e:'🍄',bg:'#2a0a0a',u:'Super-Mario-Bros.html'},
+  {t:'Super Smash Flash 2',c:'fighting',e:'👊',bg:'#2a0a2a',u:'Super-Smash-Flash-2.html'},
+  {t:'Surviv.io',c:'shooter',e:'💀',bg:'#1a2a0a',u:'Surviv.html'},
+  {t:'Tank Trouble',c:'shooter',e:'🪖',bg:'#1a1a0a',u:'Tank-Trouble.html'},
+  {t:'Tetris',c:'puzzle',e:'🟦',bg:'#0a0a2a',u:'Tetris.html'},
+  {t:'The Backrooms',c:'horror',e:'🏚️',bg:'#1a1a0a',u:'The-Backrooms.html'},
+  {t:'Tiny Fishing',c:'idle',e:'🎣',bg:'#0a1a2a',u:'Tiny-Fishing.html'},
+  {t:'Tower Defence Simulator',c:'strategy',e:'🏰',bg:'#1a1a0a',u:'Tower-Defence-Simulator.html'},
+  {t:'Tunnel Rush',c:'arcade',e:'🌀',bg:'#0a0a2a',u:'Tunnel-Rush.html'},
+  {t:'Uno Online',c:'multiplayer',e:'🃏',bg:'#2a0a0a',u:'Uno-Online.html'},
+  {t:'Vex 3',c:'platformer',e:'🏃',bg:'#0a0a1a',u:'Vex-3.html'},
+  {t:'Vex 4',c:'platformer',e:'🏃',bg:'#0a0a1a',u:'Vex-4.html'},
+  {t:'Vex 5',c:'platformer',e:'🏃',bg:'#0a0a1a',u:'Vex-5.html'},
+  {t:'Vex 6',c:'platformer',e:'🏃',bg:'#0a0a1a',u:'Vex-6.html'},
+  {t:'Vex 7',c:'platformer',e:'🏃',bg:'#0a0a1a',u:'Vex-7.html'},
+  {t:'Warbrokers.io',c:'shooter',e:'🔫',bg:'#1a1a0a',u:'Warbrokers.html'},
+  {t:'Worm Hunt',c:'multiplayer',e:'🐛',bg:'#1a2a0a',u:'Worm-Hunt.html'},
+  {t:'Wormate.io',c:'multiplayer',e:'🐍',bg:'#0a2a0a',u:'Wormate.html'},
+  {t:'X Trench Run',c:'shooter',e:'✈️',bg:'#0a0a2a',u:'X-Trench-Run.html'},
+  {t:'Zombs Royale',c:'shooter',e:'🧟',bg:'#1a0a0a',u:'Zombs-Royale.html'},
+  {t:'Zombie Derby',c:'racing',e:'🧟',bg:'#2a0a0a',u:'Zombie-Derby.html'},
+  {t:'Zombie Shooter',c:'shooter',e:'🔫',bg:'#1a0a0a',u:'Zombie-Shooter.html'},
+];
+
+const proxies=[
+  {name:'Ultraviolet',icon:'🌊',color:'#0a1a2a',desc:'The most popular open-source web proxy. Bypasses school filters through encrypted URLs.',tags:['Web Proxy','Encrypted','Open Source'],links:[{label:'Open Repo',url:'https://github.com/titaniumnetwork-dev/Ultraviolet'},{label:'Try It',url:'https://ultraviolet.astralservice.net/'}]},
+  {name:'Rammerhead',icon:'🐏',color:'#1a0a2a',desc:'Fast browser-based proxy that rewrites URLs. Works great on school Chromebooks.',tags:['Web Proxy','Chromebook','Fast'],links:[{label:'Open Repo',url:'https://github.com/binary-person/rammerhead'},{label:'Try It',url:'https://rammerhead.org/'}]},
+  {name:'Hypertabs',icon:'🗂️',color:'#2a1a0a',desc:'Full browser-in-a-tab proxy. Opens any website inside a hidden tab that looks like a normal page.',tags:['Tab Proxy','Stealth','Browser-in-Tab'],links:[{label:'Visit',url:'https://hypertabs.cc/'}]},
+  {name:'Holy Unblocker',icon:'⛪',color:'#0a0a2a',desc:'Long-running proxy with multiple backends. Supports games, YouTube, and general browsing.',tags:['Web Proxy','Games','YouTube'],links:[{label:'Visit',url:'https://holyubofficial.net/'}]},
+  {name:'Titanium Network',icon:'⚙️',color:'#1a1a1a',desc:'The team behind Ultraviolet. Hosts multiple proxy services and maintains open-source bypass tools.',tags:['Proxy Hub','Open Source','Community'],links:[{label:'Visit',url:'https://titaniumnetwork.org/'}]},
+  {name:'Interstellar',icon:'🌌',color:'#0a0a1a',desc:'Feature-rich proxy supporting games and sites. Has a built-in app store and multiple proxy backends.',tags:['Web Proxy','App Store','Games'],links:[{label:'Open Repo',url:'https://github.com/InterstellarNetwork/Interstellar'}]},
+];
+
+const gameProxySites=[
+  {name:'ByePassHub',icon:'🔓',color:'#1a0a2a',desc:'Massive collection of 2500+ unblockers, games, exploits, bookmarklets, and AI tools all in one place.',tags:['Proxy','Games','2500+ Links','Bookmarklets'],links:[{label:'GitHub',url:'https://github.com/wea-f/ByePassHub'},{label:'Visit Site',url:'https://wea-f.github.io/ByePassHub/'}]},
+  {name:'UBGHyper',icon:'🎮',color:'#0a1a2a',desc:'625+ unblocked games with a built-in tab disguise. Hides your tab as Google Classroom or Khan Academy.',tags:['Games','Tab Disguise','Chromebook'],links:[{label:'Play Now',url:'https://ubghyper.github.io/'}]},
+  {name:'YopGames',icon:'🕹️',color:'#1a2a0a',desc:'Curated unblocked games site on GitHub Pages. Fast, no ads, works on school networks.',tags:['Games','GitHub Pages','No Ads'],links:[{label:'GitHub',url:'https://github.com/yopgames/yopgames.github.io'},{label:'Play Now',url:'https://yopgames.github.io/'}]},
+  {name:'PegLeg Games',icon:'🏴‍☠️',color:'#2a1a0a',desc:'Unblocked games collection on GitHub. Includes classics and newer HTML5 games.',tags:['Games','GitHub Pages','HTML5'],links:[{label:'GitHub',url:'https://github.com/thepegleg/pegleg'},{label:'Play Now',url:'https://thepegleg.github.io/pegleg/'}]},
+  {name:'Ashton Unblocked',icon:'🎯',color:'#0a2a2a',desc:'Unblocked games hosted on GitHub for reliable access through school filters.',tags:['Games','GitHub Pages'],links:[{label:'GitHub',url:'https://github.com/Ashton20271/unblockedgames'},{label:'Play Now',url:'https://ashton20271.github.io/unblockedgames/'}]},
+  {name:'Static Quasar',icon:'⭐',color:'#2a0a1a',desc:"Google Sites-based games portal. Accessible even when GitHub is blocked since it runs on Google's own infrastructure.",tags:['Google Sites','Games','Always On'],links:[{label:'Visit',url:'https://sites.google.com/view/staticquasar/'}]},
+];
+
+const PER_PAGE=60;
+let currentCat='all',currentPage=1,filtered=[...games],currentGame=null;
+document.getElementById('totalCount').textContent=games.length;
+renderGames();renderProxies();
+
+function onSearch(){currentPage=1;applyFilter();}
+function setCategory(cat,el){
+  currentCat=cat;currentPage=1;
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('searchInput').value='';
+  applyFilter();
+}
+function applyFilter(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  filtered=games.filter(g=>(currentCat==='all'||g.c===currentCat)&&(!q||g.t.toLowerCase().includes(q)));
+  const cat=currentCat==='all'?'All Games':currentCat.charAt(0).toUpperCase()+currentCat.slice(1)+' Games';
+  document.getElementById('sectionLabel').textContent='🔥 '+cat+' ('+filtered.length+')';
+  renderGames();
+}
+function renderGames(){
+  const grid=document.getElementById('gamesGrid'),noRes=document.getElementById('noResults');
+  if(!filtered.length){grid.innerHTML='';noRes.classList.add('show');renderPagination();return;}
+  noRes.classList.remove('show');
+  const start=(currentPage-1)*PER_PAGE,page=filtered.slice(start,start+PER_PAGE);
+  grid.innerHTML=page.map(g=>`<div class="game-card" onclick="openGame('${encodeURIComponent(g.t)}','${BASE+g.u}')">
+    <div class="thumb" style="background:${g.bg}">${g.e}</div>
+    <div class="game-info"><div class="game-title">${g.t}</div><div class="game-tag">${g.c}</div></div>
+  </div>`).join('');
+  renderPagination();
+}
+function renderPagination(){
+  const total=Math.ceil(filtered.length/PER_PAGE),pg=document.getElementById('pagination');
+  if(total<=1){pg.innerHTML='';return;}
+  let h='';
+  if(currentPage>1)h+=`<button class="page-btn" onclick="goPage(${currentPage-1})">← Prev</button>`;
+  const s=Math.max(1,currentPage-2),e=Math.min(total,currentPage+2);
+  if(s>1)h+=`<button class="page-btn" onclick="goPage(1)">1</button>${s>2?'<span class="page-info">…</span>':''}`;
+  for(let i=s;i<=e;i++)h+=`<button class="page-btn${i===currentPage?' active':''}" onclick="goPage(${i})">${i}</button>`;
+  if(e<total)h+=`${e<total-1?'<span class="page-info">…</span>':''}<button class="page-btn" onclick="goPage(${total})">${total}</button>`;
+  if(currentPage<total)h+=`<button class="page-btn" onclick="goPage(${currentPage+1})">Next →</button>`;
+  h+=`<span class="page-info">Page ${currentPage} of ${total} · ${filtered.length} games</span>`;
+  pg.innerHTML=h;
+}
+function goPage(n){currentPage=n;renderGames();window.scrollTo({top:0,behavior:'smooth'});}
+
+function openGame(title,url){
+  currentGame={title:decodeURIComponent(title),url};
+  document.getElementById('modalTitle').textContent=currentGame.title;
+  document.getElementById('gframe').src=url;
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(e){
+  if(e&&e.target!==document.getElementById('overlay'))return;
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('gframe').src='';
+  document.body.style.overflow='';currentGame=null;
+}
+function goFullscreen(){const f=document.getElementById('gframe');(f.requestFullscreen||f.webkitRequestFullscreen).call(f);}
+function openTab(){if(currentGame)window.open(currentGame.url,'_blank');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.getElementById('overlay').classList.remove('open');document.getElementById('gframe').src='';document.body.style.overflow='';}});
+
+function showTab(tab,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');
+  document.getElementById('gamesPanel').style.display=tab==='games'?'block':'none';
+  document.getElementById('proxiesPanel').style.display=tab==='proxies'?'block':'none';
+  document.getElementById('catBar').style.display=tab==='games'?'flex':'none';
+}
+function renderProxies(){
+  document.getElementById('proxyGrid').innerHTML=proxies.map(p=>proxyCard(p)).join('');
+  document.getElementById('gameProxyGrid').innerHTML=gameProxySites.map(p=>proxyCard(p)).join('');
+}
+function proxyCard(p){
+  return`<div class="proxy-card">
+    <div class="proxy-header"><div class="proxy-icon" style="background:${p.color}">${p.icon}</div>
+    <div class="proxy-name"><span class="status-dot"></span>${p.name}</div></div>
+    <div class="proxy-desc">${p.desc}</div>
+    <div class="proxy-tags">${p.tags.map(t=>`<span class="ptag">${t}</span>`).join('')}</div>
+    <div class="proxy-links">${p.links.map((l,i)=>`<a class="plink${i>0?' alt':''}" href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`).join('')}</div>
+  </div>`;
+}
+</script>
+</body>
+</html>
